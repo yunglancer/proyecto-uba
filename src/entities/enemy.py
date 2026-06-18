@@ -2,21 +2,17 @@ import arcade
 from typing import Optional
 from src.core.constants import ENEMY_MAX_HP, ENEMY_MOVEMENT_SPEED, ENEMY_DETECTION_RANGE, TILE_SIZE
 
-class Enemy(arcade.Sprite):
+class Enemy(arcade.SpriteSolidColor):
     """
     Clase que representa a los enemigos ("Sumativas").
     Manejan patrullaje automático, detección de bordes predictiva y disparo.
     """
     
-    def __init__(self, image_file: str, scale: float):
+    def __init__(self):
         """
-        Inicializa al enemigo con sus valores predeterminados y caja de colisión simple.
-        
-        Args:
-            image_file: Ruta de la imagen del sprite.
-            scale: Escala de renderizado del sprite.
+        Inicializa al enemigo (Greyboxing: Cuadrado Rojo).
         """
-        super().__init__(filename=image_file, scale=scale, hit_box_algorithm="Simple")
+        super().__init__(64, 64, arcade.color.RED)
         
         # Estadísticas
         self.hp: int = ENEMY_MAX_HP

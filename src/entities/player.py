@@ -34,6 +34,14 @@ class Player(arcade.Sprite):
         self.is_invulnerable: bool = False
         self.invulnerability_timer: float = 0.0
         
+        # Sistema de Combate
+        self.can_shoot: bool = True
+        self.shoot_timer: float = 0.0
+        self.shoot_cooldown: float = 0.5
+        
+        # Dirección a la que mira el jugador (1 = derecha, -1 = izquierda)
+        self.facing_direction: int = 1
+        
     def take_damage(self, amount: int = 1) -> None:
         """
         Aplica daño al jugador considerando el escudo y los I-Frames.
@@ -68,6 +76,17 @@ class Player(arcade.Sprite):
         self.can_double_jump = True
         self.is_jumping = False
         
+    def attempt_shoot(self) -> bool:
+        """
+        Intenta disparar. Devuelve True si el cooldown lo permite.
+        Al disparar, reinicia el timer.
+        """
+        if self.can_shoot:
+            self.can_shoot = False
+            self.shoot_timer = self.shoot_cooldown
+            return True
+        return False
+        
     def on_update(self, delta_time: float = 1/60) -> None:
         """
         Actualización lógica del jugador en cada frame.
@@ -88,3 +107,15 @@ class Player(arcade.Sprite):
             if self.invulnerability_timer <= 0:
                 self.is_invulnerable = False
                 self.alpha = 255  # Restaura la opacidad total
+                
+        # Actualización del Cooldown de Disparo
+        if not self.can_shoot:
+            self.shoot_timer -= delta_time
+            if self.shoot_timer <= 0:
+                self.can_shoot = True
+                
+        # Actualización de la dirección según el movimiento
+        if self.change_x > 0:
+            self.facing_direction = 1
+        elif self.change_x < 0:
+            self.facing_direction = -1

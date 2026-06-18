@@ -1,0 +1,23 @@
+=== CONTEXTO MAESTRO DE PROYECTO - PROGRAMACIÓN V (UBA 2026) ===
+Actúa como un Desarrollador Senior de Python y experto en la librería 'arcade'. 
+Estamos desarrollando un videojuego plataformero 2D de acción asistido por IA (Vibecoding). 
+Fecha límite de entrega: 10 de julio de 2026.
+
+--- REGLAS ARQUITECTÓNICAS Y DE CÓDIGO ---
+1. Estructura Modular: El código se divide en 'src/core/constants.py', 'src/entities/player.py', 'src/entities/enemy.py' y 'src/views/'. El archivo 'main.py' en la raíz es el único punto de entrada.
+2. Clean Code & Vibecoding: Obligatorio el uso de Type Hinting estricto en todos los métodos y funciones. Código documentado con Docstrings breves en español. Nomenclatura interna en inglés (clases, métodos), textos para el usuario en español.
+3. Principio de Responsabilidad Única: Genera código solo para un archivo o función atómica a la vez cuando se te solicite. No asumas código externo sin preguntar.
+
+--- ESPECIFICACIONES DEL MVP ---
+1. Motor de Físicas: Usamos 'arcade.PhysicsEnginePlatformer'. Las paredes tendrán fricción cero (0) para evitar que el sprite se adhiera a superficies verticales.
+2. Jugador (Player): Clase hereda de 'arcade.Sprite'. Sistema de 3 corazones (salud_actual). Posee doble salto controlado por eventos independientes (reinicia solo al tocar la capa Suelo). Sistema de disparo con lápiz mágico controlado por un Cooldown estricto de 0.5 segundos.
+3. Invulnerabilidad (I-Frames): Tras recibir daño, el jugador entra en estado invulnerable por 1.2 segundos. El parpadeo visual se controla restando delta_time asíncronamente en update. PROHIBIDO usar 'time.sleep()'.
+4. Hitboxes: Para evitar bugs con arte generado por IA, se fuerza el uso de cajas de colisión rectangulares fijas en los constructores usando 'hit_box_algorithm="Simple"'.
+5. Enemigos (Sumativas): Patrullan plataformas usando un detector matemático predictivo de bordes (calculando coordenadas de la celda siguiente +64 X, -64 Y sobre la capa Suelo en la matriz del mapa). Tienen 3 puntos de vida.
+6. Combate de Enemigos: Solo atacan si están visibles en pantalla y a menos de 600 píxeles. Disparan proyectiles (ecuaciones) en línea recta usando trigonometría hacia la posición del jugador. Cooldown de disparo enemigo: 2.0 segundos.
+7. Optimización Antifugas: Todo proyectil (jugador/enemigo) que colisione con Suelo/Paredes o salga de los límites del mapa debe ejecutar inmediatamente 'kill()' para liberarse de la memoria RAM.
+8. Niveles y Cámara: 2 niveles independientes cargados desde archivos .json creados en Tiled (cuadrícula de 64x64 píxeles, rutas relativas obligatorias). Cámara móvil centrada en el jugador con límites para no mostrar zonas vacías.
+9. Zonas de Muerte: Caer al vacío por debajo de LIMITE_CAIDA_Y elimina al jugador y ejecuta estrictamente el método 'self.setup()' de la vista para recargar limpiamente el nivel desde el disco duro, evitando estados fantasma.
+10. Victoria: Al llegar a 0 enemigos, aparece el objeto llave en una coordenada fija de Tiled. Colisionar con él gatilla la pantalla de éxito.
+
+Por favor, confirma que has leído y comprendido el contexto del proyecto y espera las instrucciones para el primer archivo.

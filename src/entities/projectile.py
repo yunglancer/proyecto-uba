@@ -2,22 +2,25 @@ import arcade
 from typing import Optional
 from src.core.constants import TILE_SIZE
 
-class Projectile(arcade.Sprite):
+class Projectile(arcade.SpriteSolidColor):
     """
     Clase para manejar proyectiles (ráfagas de grafito y ecuaciones matemáticas).
     Incorpora rutinas estrictas de optimización para evitar memory leaks.
     """
     
-    def __init__(self, image_file: str, scale: float, is_enemy_projectile: bool = False):
+    def __init__(self, is_enemy_projectile: bool = False):
         """
-        Inicializa un proyectil genérico.
+        Inicializa un proyectil genérico (Greyboxing con color sólido).
         
         Args:
-            image_file: Ruta de la imagen del proyectil.
-            scale: Escala de renderizado.
             is_enemy_projectile: Define si es una ecuación (True) o grafito (False).
         """
-        super().__init__(filename=image_file, scale=scale, hit_box_algorithm="Simple")
+        if is_enemy_projectile:
+            # Ecuación enemiga: Cuadrado rojo
+            super().__init__(10, 10, arcade.color.RED)
+        else:
+            # Lápiz Mágico: Rectángulo amarillo (tipo láser)
+            super().__init__(20, 5, arcade.color.YELLOW)
         
         # Etiqueta para distinguir entre ataques del jugador y de las sumativas
         self.is_enemy_projectile: bool = is_enemy_projectile
