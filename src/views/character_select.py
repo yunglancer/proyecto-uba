@@ -72,11 +72,11 @@ class CharacterSelect(arcade.View):
         self.manager.disable()
 
     def on_click_robot(self, event):
-        self.window.current_skin = ":resources:images/animated_characters/robot/robot_idle.png"
+        self.window.current_skin = ":resources:images/animated_characters/robot/robot_idle.png"  # type: ignore
         self.update_status()
         
     def on_click_zombie(self, event):
-        self.window.current_skin = ":resources:images/animated_characters/zombie/zombie_idle.png"
+        self.window.current_skin = ":resources:images/animated_characters/zombie/zombie_idle.png"  # type: ignore
         self.update_status()
 
     def on_click_back(self, event):

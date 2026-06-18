@@ -1,6 +1,5 @@
 import arcade
 import arcade.gui
-from src.core.constants import SCREEN_WIDTH, SCREEN_HEIGHT
 
 class GameOver(arcade.View):
     """
