@@ -1,0 +1,33 @@
+juego 
+
+¡Excelente iniciativa! Como Lead Programmer, tienes que asegurarte de que tu diseñador no se quede bloqueado esperando que tú termines de programar. El trabajo en paralelo es la clave para llegar al 10 de julio con un juego pulido.
+Tu compañero tiene una ventaja brutal al saber usar IA generativa para imágenes, pero el arte para videojuegos es engañoso: no basta con que la imagen sea "bonita", tiene que ser técnicamente funcional para que tu código no explote.
+Aquí tienes el Sprint 0 y 1 para tu Diseñador/Level Designer, enfocado puramente en que te entregue los assets funcionales que vas a necesitar cuando dejemos de usar las "cajas grises". Pásale esto tal cual:
+🎨 SPRINT DE ARTE Y DISEÑO (Para el Diseñador Visual)
+Fecha de Entrega Interna: 24 de Junio (Semana 1)Ç
+Tu misión principal en esta fase no es armar los niveles jugables todavía, sino crear la "caja de Legos" (los Assets) que usaremos para construir todo el juego.
+Misión 1: Estandarización de Spritesheets (Personajes)
+La Inteligencia Artificial es genial creando personajes, pero falla en la consistencia. Tu tarea técnica más importante es limpiar los sprites generados para que encajen en una cuadrícula estricta, de lo contrario, el jugador se quedará pegado a las paredes.
+Entregables obligatorios (Formato .PNG transparente):
+Spritesheet del Estudiante (Jugador):
+Dimensiones: Cada frame de animación debe estar dentro de un cuadrado invisible exacto (ej. 128x128 píxeles). El centro de la cabeza del personaje debe estar siempre en el mismo punto de ese cuadrado en cada imagen.
+Animaciones mínimas: Idle (Quieto respirando), Run (Corriendo), Jump (Saltando).
+Spritesheet de las "Sumativas" (Enemigos):
+Diseño de un monstruo hecho de exámenes o papel arrugado.
+Animaciones mínimas: Walk (Caminando) y Hit (Recibiendo daño, puede ser un simple cambio de color a rojo).
+Proyectiles y Objetos:
+Lápiz o trozo de grafito (disparo del jugador).
+Símbolo matemático rojo o examen volador (disparo del enemigo).
+Objeto de Victoria (El carnet de la UBA o un sello de aprobado).
+Misión 2: El "Tileset" (Bloques de Construcción)
+Necesitas generar las imágenes de los "bloques" que usarás para armar la universidad.
+Regla de Oro: Cada bloque individual (pared, suelo, techo) debe medir exactamente 64x64 píxeles.
+Crea texturas para: Pasillos de la UBA, baldosas, paredes interiores y al menos dos fondos grandes y panorámicos para poner detrás de los niveles.
+Misión 3: Configuración de Tiled y Primer Mapa de Prueba
+Descarga el software Tiled (es gratuito y estándar en la industria). Configúralo así:
+Crea un mapa ortogonal nuevo y establece el tamaño de la cuadrícula en 64x64 píxeles.
+CRÍTICO: Configura Tiled para que guarde las imágenes usando Rutas Relativas, no absolutas (para que no se rompan las rutas cuando el programador abra el mapa en su PC).
+Arma un mapa de prueba muy pequeño y simple (solo pisos y algunas paredes) con tus nuevas imágenes de 64x64 y expórtalo como .json.
+Punto de Control: Una vez que me entregues el .json del mapa de prueba y los sprites recortados a la perfección en PNG, haré la integración inicial con la cámara y las físicas.
+Con esta hoja de ruta, tu compañero puede arrancar a trabajar en paralelo de inmediato, peleando con sus propios "jefes finales" (la limpieza de los sprites y Tiled) mientras nosotros nos enfocamos en el código del Graybox con Antigravity.
+¿Se lo compartimos y pasamos a la terminal de Antigravity para pedirle a la IA el código de nuestro archivo constants.py?

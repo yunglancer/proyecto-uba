@@ -1,28 +1,33 @@
 """
-Módulo de constantes globales para el proyecto UBA - Sumativas.
-Aquí se definen los valores estáticos fundamentales del juego.
+Constantes globales para el juego (Proyecto UBA).
 """
 
-# Configuración de la Ventana
-SCREEN_WIDTH: int = 1280
-SCREEN_HEIGHT: int = 720
-SCREEN_TITLE: str = "UBA - Combate de Sumativas"
+# Configuración de Ventana
+SCREEN_WIDTH = 1280
+SCREEN_HEIGHT = 720
+SCREEN_TITLE = "Proyecto UBA - Plataformero Asistido por IA"
 
-# Configuración del TileMap y Escala
-TILE_SIZE: int = 64
-SPRITE_SCALING: float = 1.0
+# Configuración de Tiles y Escala
+TILE_SIZE = 64
+SPRITE_SCALING = 1.0
 
-# Constantes del Jugador
-PLAYER_MAX_HP: int = 3
-PLAYER_MOVEMENT_SPEED: float = 5.0
-PLAYER_JUMP_SPEED: float = 12.0
-GRAVITY: float = 0.8
-I_FRAMES_DURATION: float = 1.2  # Segundos de invulnerabilidad
+# Físicas
+GRAVITY = 1.0
+PLAYER_MOVEMENT_SPEED = 5
+PLAYER_JUMP_SPEED = 15
+LIMITE_CAIDA_Y = -1000  # Límite donde el jugador muere al caer
 
-# Constantes del Enemigo (Sumativas)
-ENEMY_MAX_HP: int = 3
-ENEMY_MOVEMENT_SPEED: float = 2.0
-ENEMY_DETECTION_RANGE: int = 600  # Rango en píxeles para detectar al jugador
+# Estadísticas del Jugador
+PLAYER_MAX_HP = 3
+I_FRAMES_DURATION = 1.2  # Segundos de invulnerabilidad
+PLAYER_SHOOT_COOLDOWN = 0.5  # Segundos entre disparos
 
-# Límites del Mundo
-LIMITE_CAIDA_Y: int = -1000  # Cota Y bajo la cual el jugador muere instantáneamente
+# Estadísticas del Enemigo
+ENEMY_MAX_HP = 3
+ENEMY_SHOOT_COOLDOWN = 2.0  # Segundos entre disparos
+ENEMY_MOVEMENT_SPEED = 2
+ENEMY_DETECTION_RANGE = 600  # Píxeles de distancia para atacar
+
+# Velocidad de Proyectiles
+PROJECTILE_SPEED = 10
+
