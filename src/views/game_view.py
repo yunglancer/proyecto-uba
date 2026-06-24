@@ -68,9 +68,14 @@ class GameView(arcade.View):
         
         if os.path.exists(map_path):
             # Carga real del mapa Tiled (El compañero generará estos JSON)
-            self.tile_map = arcade.load_tilemap(map_path, scaling=SPRITE_SCALING)
-            self.scene = arcade.Scene.from_tilemap(self.tile_map)
-        else:
+            try:
+                self.tile_map = arcade.load_tilemap(map_path, scaling=SPRITE_SCALING)
+                self.scene = arcade.Scene.from_tilemap(self.tile_map)
+            except Exception as e:
+                print(f"Error cargando mapa {map_path}: {e}. Usando mapa placeholder.")
+                self.tile_map = None
+                
+        if not self.tile_map:
             # Fallback Placeholder para probar plataformas, huecos y muros
             self.scene = arcade.Scene()
             self.scene.add_sprite_list("Suelo")
@@ -120,17 +125,17 @@ class GameView(arcade.View):
         # Generar Enemigos (Sumativas) de prueba
         enemy1 = Enemy()
         enemy1.center_x = 550
-        enemy1.center_y = 160 + 64 # Sobre la Plataforma 1
+        enemy1.bottom = 160 + 32 # Sobre la Plataforma 1
         self.scene.add_sprite("Enemigos", enemy1)
         
         enemy2 = Enemy()
         enemy2.center_x = 1500
-        enemy2.center_y = 288 + 64 # Sobre la Plataforma 2
+        enemy2.bottom = 288 + 32 # Sobre la Plataforma 2
         self.scene.add_sprite("Enemigos", enemy2)
         
         enemy3 = Enemy()
         enemy3.center_x = 1800
-        enemy3.center_y = 32 + 64 # En el suelo firme tras el hueco
+        enemy3.bottom = 32 + 32 # En el suelo firme tras el hueco
         self.scene.add_sprite("Enemigos", enemy3)
             
         # 4. Motor de Físicas (Plataformero estricto)
@@ -360,7 +365,6 @@ class GameView(arcade.View):
         # 5.7 Colisión con la Llave (Ganar)
         if self.llave_spawned:
             if arcade.check_for_collision_with_list(self.player_sprite, self.scene.get_sprite_list("Llave")):
-                from src.views.game_over import GameOver
                 victory_view = GameOver(is_victory=True)
                 self.window.show_view(victory_view)
                     
