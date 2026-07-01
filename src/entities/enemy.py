@@ -31,7 +31,7 @@ class Enemy(arcade.Sprite):
         # Estado de disparo
         self.can_shoot: bool = True
         self.shoot_timer: float = 0.0
-        self.shoot_cooldown: float = 2.0  # Segundos entre disparos
+        self.shoot_cooldown: float = 4.5  # Segundos entre disparos
         
         # Estado de Animación
         self.character_face_direction: int = 0  # 0 = Derecha, 1 = Izquierda

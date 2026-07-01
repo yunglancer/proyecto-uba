@@ -1,33 +1,73 @@
 import arcade
 import arcade.gui
 
-# Estilo global de madera para los botones (basado en la imagen de referencia)
-WOOD_STYLE = {
-    "normal": {
-        "font_name": ("Arial", "calibri"),
-        "font_size": 18,
-        "font_color": arcade.color.WHITE,
-        "border_width": 3,
-        "border_color": (50, 25, 10),  # Marrón muy oscuro
-        "bg_color": (160, 82, 45),     # Sienna / Madera clara
-    },
-    "hover": {
-        "font_name": ("Arial", "calibri"),
-        "font_size": 18,
-        "font_color": arcade.color.WHITE,
-        "border_width": 3,
-        "border_color": (50, 25, 10),
-        "bg_color": (205, 133, 63),    # Madera resaltada
-    },
-    "press": {
-        "font_name": ("Arial", "calibri"),
-        "font_size": 18,
-        "font_color": arcade.color.WHITE,
-        "border_width": 3,
-        "border_color": arcade.color.WHITE,
-        "bg_color": (101, 67, 33),     # Madera oscura
-    }
-}
+class AnimatedButton(arcade.gui.UIFlatButton):
+    def __init__(self, text="", width=300, height=50, **kwargs):
+        super().__init__(text=text, width=width, height=height, **kwargs)
+        self.clear()  # Elimina el UILabel interno para evitar el texto doble
+        
+    def do_render(self, surface: arcade.gui.Surface):
+        self.prepare_render(surface)
+        
+        # Limpiar el fondo con transparencia
+        surface.clear(arcade.color.TRANSPARENT_BLACK)
+        
+        # Determinar estado y offset
+        # Estado presionado: el botón baja.
+        # Estado hover: el botón se ilumina.
+        if self.pressed:
+            bg_color = (41, 128, 185)      # Azul más oscuro
+            shadow_color = (31, 97, 141)
+            bottom_offset = 0              # Baja al nivel del suelo
+        elif self.hovered:
+            bg_color = (93, 173, 226)      # Azul claro iluminado
+            shadow_color = (31, 97, 141)
+            bottom_offset = 6              # Se levanta ligeramente
+        else:
+            bg_color = (52, 152, 219)      # Azul estándar
+            shadow_color = (31, 97, 141)
+            bottom_offset = 4              # Altura normal
+
+        rect_height = self.height - 6      # Altura del botón visual
+
+        # 1. Dibujar sombra (siempre en la parte inferior)
+        if bottom_offset > 0:
+            arcade.draw_lbwh_rectangle_filled(
+                0, 0, 
+                self.width, rect_height, 
+                shadow_color
+            )
+
+        # 2. Dibujar el cuerpo del botón
+        arcade.draw_lbwh_rectangle_filled(
+            0, bottom_offset, 
+            self.width, rect_height, 
+            bg_color
+        )
+        
+        # 3. Dibujar borde si está en hover (para resaltarlo más)
+        if self.hovered and not self.pressed:
+            arcade.draw_lbwh_rectangle_outline(
+                0, bottom_offset, 
+                self.width, rect_height, 
+                arcade.color.WHITE, 
+                border_width=2
+            )
+
+        # 4. Dibujar texto centrado en el cuerpo del botón
+        text_y = bottom_offset + (rect_height / 2)
+        text = arcade.Text(
+            self.text,
+            self.width / 2,
+            text_y,
+            arcade.color.WHITE,
+            font_size=16,
+            font_name=("Arial", "sans-serif"),
+            anchor_x="center",
+            anchor_y="center",
+            bold=True
+        )
+        text.draw()
 
 class MainMenu(arcade.View):
     """
@@ -62,19 +102,19 @@ class MainMenu(arcade.View):
         self.v_box.add(arcade.gui.UIWidget(height=40))
         
         # Botones con estilo personalizado
-        btn_play = arcade.gui.UIFlatButton(text="Jugar", width=300, style=WOOD_STYLE)
+        btn_play = AnimatedButton(text="Jugar", width=300)
         btn_play.on_click = self.on_click_play
         self.v_box.add(btn_play)
         
-        btn_char = arcade.gui.UIFlatButton(text="Selección de Personaje", width=300, style=WOOD_STYLE)
+        btn_char = AnimatedButton(text="Selección de Personaje", width=300)
         btn_char.on_click = self.on_click_char
         self.v_box.add(btn_char)
         
-        btn_controls = arcade.gui.UIFlatButton(text="Controles", width=300, style=WOOD_STYLE)
+        btn_controls = AnimatedButton(text="Controles", width=300)
         btn_controls.on_click = self.on_click_controls
         self.v_box.add(btn_controls)
         
-        btn_settings = arcade.gui.UIFlatButton(text="Configuración", width=300, style=WOOD_STYLE)
+        btn_settings = AnimatedButton(text="Configuración", width=300)
         btn_settings.on_click = self.on_click_settings
         self.v_box.add(btn_settings)
         
