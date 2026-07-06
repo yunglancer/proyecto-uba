@@ -17,10 +17,10 @@ class Projectile(arcade.SpriteSolidColor):
         """
         if is_enemy_projectile:
             # Ecuación enemiga: Cuadrado rojo
-            super().__init__(10, 10, arcade.color.RED)
+            super().__init__(10, 10, color=arcade.color.RED)
         else:
             # Lápiz Mágico: Rectángulo amarillo (tipo láser)
-            super().__init__(20, 5, arcade.color.YELLOW)
+            super().__init__(20, 5, color=arcade.color.YELLOW)
         
         # Etiqueta para distinguir entre ataques del jugador y de las sumativas
         self.is_enemy_projectile: bool = is_enemy_projectile

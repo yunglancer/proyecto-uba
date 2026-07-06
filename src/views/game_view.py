@@ -78,65 +78,107 @@ class GameView(arcade.View):
         if not self.tile_map:
             # Fallback Placeholder para probar plataformas, huecos y muros
             self.scene = arcade.Scene()
-            self.scene.add_sprite_list("Suelo")
+            self.scene.add_sprite_list("Suelo", use_spatial_hash=True)
             
             def crear_bloque(x, y):
-                bloque = arcade.SpriteSolidColor(64, 64, arcade.color.DARK_GREEN)
+                bloque = arcade.SpriteSolidColor(64, 64, color=arcade.color.DARK_GREEN)
                 bloque.center_x = x
                 bloque.center_y = y
                 self.scene.add_sprite("Suelo", bloque)
 
-            # Suelo base (con un hueco en el medio para probar caídas)
-            for x in range(0, 3000, 64):
-                if x < 800 or x > 1100:
-                    crear_bloque(x, 32)
+            # Suelo base (con múltiples huecos para saltar)
+            for x in range(0, 10000, 64):
+                # Hueco 1
+                if 800 <= x <= 1100: continue
+                # Hueco 2
+                if 2500 <= x <= 2900: continue
+                # Hueco 3
+                if 4500 <= x <= 5000: continue
+                # Hueco 4
+                if 6500 <= x <= 6900: continue
+                # Hueco 5 (Salto largo antes del final)
+                if 8500 <= x <= 9100: continue
+                
+                crear_bloque(x, 32)
             
-            # Plataforma 1 (Baja)
-            for x in range(400, 700, 64):
-                crear_bloque(x, 160)
-                
-            # Plataforma 2 (Alta)
-            for x in range(1300, 1700, 64):
-                crear_bloque(x, 288)
-                
-            # Muro vertical para probar bloqueo de balas
-            for y in range(32, 288, 64):
-                crear_bloque(2200, y)
+            # Plataforma 1
+            for x in range(400, 700, 64): crear_bloque(x, 160)
+            # Plataforma 2 sobre Hueco 1
+            for x in range(900, 1000, 64): crear_bloque(x, 220)
+            # Plataforma 3
+            for x in range(1300, 1700, 64): crear_bloque(x, 288)
+            # Escaleras
+            for x in range(3200, 3500, 64): crear_bloque(x, 160)
+            for x in range(3500, 3800, 64): crear_bloque(x, 288)
+            for x in range(3800, 4100, 64): crear_bloque(x, 416)
+            
+            # Plataformas saltarinas sobre Hueco 3
+            crear_bloque(4600, 160)
+            crear_bloque(4800, 288)
+            
+            # Zona elevada
+            for x in range(5200, 5800, 64): crear_bloque(x, 300)
+            
+            # Muro bloqueador
+            for y in range(32, 288, 64): crear_bloque(2200, y)
+            for y in range(32, 400, 64): crear_bloque(6000, y)
                 
         # Asegurarnos de que las capas obligatorias existan en el Scene (por si el JSON está incompleto)
-        for layer in ["Player", "Enemigos", "Proyectiles", "Objetos", "Suelo"]:
+        for layer in ["Player", "Enemigos", "Proyectiles", "Objetos", "Suelo", "Meta"]:
             try:
                 self.scene.get_sprite_list(layer)
             except KeyError:
-                self.scene.add_sprite_list(layer)
+                if layer in ["Suelo", "Objetos", "Meta"]:
+                    self.scene.add_sprite_list(layer, use_spatial_hash=True)
+                else:
+                    self.scene.add_sprite_list(layer)
         
         # Instanciar al jugador
         self.player_sprite = Player(self.player_skin, SPRITE_SCALING)
-        
-        # Opcional: Leer punto de Spawn desde Tiled. Por defecto fijamos 128x256
         self.player_sprite.center_x = 128
         self.player_sprite.center_y = 256
         self.scene.add_sprite("Player", self.player_sprite)
         
-        # Lista para la Llave de Aprobado
-        self.scene.add_sprite_list("Llave")
-        self.llave_spawned = False
+        # Crear la Meta (Bandera)
+        self.meta_pilar = arcade.SpriteSolidColor(16, 300, color=arcade.color.GRAY)
+        self.meta_pilar.center_x = 9500
+        self.meta_pilar.bottom = 64
+        self.scene.add_sprite("Meta", self.meta_pilar)
         
-        # Generar Enemigos (Sumativas) de prueba
-        enemy1 = Enemy()
-        enemy1.center_x = 550
-        enemy1.bottom = 160 + 32 # Sobre la Plataforma 1
-        self.scene.add_sprite("Enemigos", enemy1)
+        self.meta_bandera = arcade.SpriteSolidColor(64, 48, color=arcade.color.RED)
+        self.meta_bandera.left = 9508
+        self.meta_bandera.top = self.meta_pilar.top - 10
+        self.scene.add_sprite("Meta", self.meta_bandera)
         
-        enemy2 = Enemy()
-        enemy2.center_x = 1500
-        enemy2.bottom = 288 + 32 # Sobre la Plataforma 2
-        self.scene.add_sprite("Enemigos", enemy2)
+        # Generar Enemigos (Sumativas) distribuidos
+        posiciones_enemigos = [
+            (550, 160), (1500, 288), (1800, 32), (2400, 32), 
+            (3350, 160), (3650, 288), (3950, 416), (5500, 300),
+            (6200, 32), (7200, 32), (8000, 32), (9200, 32)
+        ]
         
-        enemy3 = Enemy()
-        enemy3.center_x = 1800
-        enemy3.bottom = 32 + 32 # En el suelo firme tras el hueco
-        self.scene.add_sprite("Enemigos", enemy3)
+        for x, y in posiciones_enemigos:
+            enemy = Enemy()
+            enemy.center_x = x
+            enemy.bottom = y + 32
+            self.scene.add_sprite("Enemigos", enemy)
+            
+        # Generar Coleccionables (Corazones y Escudos)
+        posiciones_objetos = [
+            (1200, 32, "hp"), (2600, 200, "shield"), (4200, 32, "hp"), 
+            (5700, 300, "hp"), (6800, 32, "shield"), (8500, 32, "hp")
+        ]
+        
+        for x, y, obj_type in posiciones_objetos:
+            if obj_type == "hp":
+                obj = arcade.SpriteSolidColor(24, 24, color=arcade.color.RED)
+            else:
+                obj = arcade.SpriteSolidColor(32, 32, color=arcade.color.CYAN)
+            
+            obj.pickup_type = obj_type
+            obj.center_x = x
+            obj.bottom = y + 64
+            self.scene.add_sprite("Objetos", obj)
             
         # 4. Motor de Físicas (Plataformero estricto)
         # Se ancla la gravedad y se utiliza la capa "Suelo" estrictamente como pared
@@ -354,19 +396,21 @@ class GameView(arcade.View):
                     self.player_sprite.take_damage(1)
                     proj.kill()
                     
-        # 5.6 Condición de Victoria (Aparición de la Llave)
-        if len(self.scene.get_sprite_list("Enemigos")) == 0 and not self.llave_spawned:
-            self.llave_spawned = True
-            llave = arcade.SpriteSolidColor(32, 32, arcade.color.GOLD)
-            llave.center_x = 2400  # Más allá del muro
-            llave.center_y = 64
-            self.scene.add_sprite("Llave", llave)
-            
-        # 5.7 Colisión con la Llave (Ganar)
-        if self.llave_spawned:
-            if arcade.check_for_collision_with_list(self.player_sprite, self.scene.get_sprite_list("Llave")):
-                victory_view = GameOver(is_victory=True)
-                self.window.show_view(victory_view)
+        # 5.5.5 Lógica de Coleccionables (Objetos)
+        objetos_recolectados = arcade.check_for_collision_with_list(self.player_sprite, self.scene.get_sprite_list("Objetos"))
+        for obj in objetos_recolectados:
+            if hasattr(obj, "pickup_type"):
+                if obj.pickup_type == "hp":
+                    from src.core.constants import PLAYER_MAX_HP
+                    self.player_sprite.hp = min(self.player_sprite.hp + 1, PLAYER_MAX_HP)
+                elif obj.pickup_type == "shield":
+                    self.player_sprite.has_bubble_shield = True
+            obj.kill()
+                    
+        # 5.6 Condición de Victoria (Alcanzar la Bandera)
+        if arcade.check_for_collision_with_list(self.player_sprite, self.scene.get_sprite_list("Meta")):
+            victory_view = GameOver(is_victory=True)
+            self.window.show_view(victory_view)
                     
         # 6. ZONA DE MUERTE: Si el jugador cae al vacío
         if self.player_sprite.center_y < LIMITE_CAIDA_Y:
