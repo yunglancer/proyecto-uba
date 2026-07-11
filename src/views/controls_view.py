@@ -1,5 +1,6 @@
 import arcade
 import arcade.gui
+from src.views.main_menu import AnimatedButton
 
 class ControlsView(arcade.View):
     """
@@ -13,8 +14,9 @@ class ControlsView(arcade.View):
         self.v_box = arcade.gui.UIBoxLayout(space_between=15)
         
         title = arcade.gui.UILabel(
-            text="Controles",
+            text="Controles del Juego",
             font_size=36,
+            font_name=("Kenney Future", "Arial"),
             text_color=arcade.color.WHITE,
             bold=True
         )
@@ -27,7 +29,7 @@ class ControlsView(arcade.View):
             "- W o Espacio: Saltar\n"
             "- Doble Salto: Presiona saltar nuevamente en el aire\n\n"
             "Combate:\n"
-            "- J, Z o Clic Izquierdo: Disparar Lápiz Mágico\n"
+            "- J, Z o Clic Izquierdo: Disparar Láser\n"
             "- Escudo Burbuja: Te protege de un impacto automáticamente"
         )
         controls_label = arcade.gui.UITextArea(
@@ -40,7 +42,7 @@ class ControlsView(arcade.View):
         self.v_box.add(controls_label)
         self.v_box.add(arcade.gui.UIWidget(height=40))
         
-        btn_back = arcade.gui.UIFlatButton(text="Volver al Menú", width=250)
+        btn_back = AnimatedButton(text="Volver al Menú", width=300)
         btn_back.on_click = self.on_click_back
         self.v_box.add(btn_back)
         
@@ -53,7 +55,7 @@ class ControlsView(arcade.View):
         self.manager.add(anchor)
 
     def on_show_view(self) -> None:
-        arcade.set_background_color(arcade.color.DARK_MIDNIGHT_BLUE)
+        arcade.set_background_color((15, 15, 20))
         self.manager.enable()
         
     def on_hide_view(self):

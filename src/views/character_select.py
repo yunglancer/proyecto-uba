@@ -1,5 +1,6 @@
 import arcade
 import arcade.gui
+from src.views.main_menu import AnimatedButton
 
 class CharacterSelect(arcade.View):
     """
@@ -15,8 +16,9 @@ class CharacterSelect(arcade.View):
         
         # Título
         title = arcade.gui.UILabel(
-            text="Selección de Personaje",
+            text="Selector de Personaje",
             font_size=36,
+            font_name=("Kenney Future", "Arial"),
             text_color=arcade.color.WHITE,
             bold=True
         )
@@ -25,25 +27,25 @@ class CharacterSelect(arcade.View):
         
         # Label de estado
         self.status_label = arcade.gui.UILabel(
-            text="Personaje Actual: Robot",
+            text="Chasis Actual: Robot",
             font_size=20,
-            text_color=arcade.color.YELLOW
+            font_name=("Kenney Future", "Arial"),
+            text_color=arcade.color.LIGHT_GREEN
         )
         self.v_box.add(self.status_label)
         self.v_box.add(arcade.gui.UIWidget(height=20))
         
-        # Botones de Skin
-        btn_robot = arcade.gui.UIFlatButton(text="Elegir Robot", width=250)
+        btn_robot = AnimatedButton(text="Chasis Robot", width=300)
         btn_robot.on_click = self.on_click_robot
         self.v_box.add(btn_robot)
         
-        btn_zombie = arcade.gui.UIFlatButton(text="Elegir Zombie", width=250)
+        btn_zombie = AnimatedButton(text="Sobreviviente Humano", width=300)
         btn_zombie.on_click = self.on_click_zombie
         self.v_box.add(btn_zombie)
         self.v_box.add(arcade.gui.UIWidget(height=40))
         
         # Volver
-        btn_back = arcade.gui.UIFlatButton(text="Volver al Menú", width=250)
+        btn_back = AnimatedButton(text="Volver al Menú", width=300)
         btn_back.on_click = self.on_click_back
         self.v_box.add(btn_back)
         
@@ -59,12 +61,12 @@ class CharacterSelect(arcade.View):
         # Protegernos en caso de que aún no exista la variable
         skin = getattr(self.window, "current_skin", "robot")
         if "robot" in skin:
-            self.status_label.text = "Personaje Actual: Robot"
+            self.status_label.text = "Chasis Actual: Robot"
         else:
-            self.status_label.text = "Personaje Actual: Zombie"
+            self.status_label.text = "Chasis Actual: Sobreviviente"
 
     def on_show_view(self) -> None:
-        arcade.set_background_color(arcade.color.DARK_SLATE_GRAY)
+        arcade.set_background_color((15, 15, 20))
         self.manager.enable()
         self.update_status()
         
@@ -76,7 +78,7 @@ class CharacterSelect(arcade.View):
         self.update_status()
         
     def on_click_zombie(self, event):
-        self.window.current_skin = ":resources:images/animated_characters/zombie/zombie_idle.png"  # type: ignore
+        self.window.current_skin = ":resources:images/animated_characters/female_person/femalePerson_idle.png"  # type: ignore
         self.update_status()
 
     def on_click_back(self, event):

@@ -16,16 +16,16 @@ class AnimatedButton(arcade.gui.UIFlatButton):
         # Estado presionado: el botón baja.
         # Estado hover: el botón se ilumina.
         if self.pressed:
-            bg_color = (41, 128, 185)      # Azul más oscuro
-            shadow_color = (31, 97, 141)
+            bg_color = (39, 174, 96)       # Verde oscuro
+            shadow_color = (30, 132, 73)
             bottom_offset = 0              # Baja al nivel del suelo
         elif self.hovered:
-            bg_color = (93, 173, 226)      # Azul claro iluminado
-            shadow_color = (31, 97, 141)
+            bg_color = (88, 214, 141)      # Verde iluminado
+            shadow_color = (30, 132, 73)
             bottom_offset = 6              # Se levanta ligeramente
         else:
-            bg_color = (52, 152, 219)      # Azul estándar
-            shadow_color = (31, 97, 141)
+            bg_color = (46, 204, 113)      # Verde estándar vibrante
+            shadow_color = (30, 132, 73)
             bottom_offset = 4              # Altura normal
 
         rect_height = self.height - 6      # Altura del botón visual
@@ -61,8 +61,8 @@ class AnimatedButton(arcade.gui.UIFlatButton):
             self.width / 2,
             text_y,
             arcade.color.WHITE,
-            font_size=16,
-            font_name=("Arial", "sans-serif"),
+            font_size=18,
+            font_name=("Kenney Future", "Arial"),
             anchor_x="center",
             anchor_y="center",
             bold=True
@@ -85,17 +85,19 @@ class MainMenu(arcade.View):
         
         # Título principal
         title_label = arcade.gui.UILabel(
-            text="- UBA -",
+            text="- ROBOTS VS ZOMBIES -",
             font_size=50,
+            font_name=("Kenney Future", "Arial"),
             text_color=arcade.color.WHITE,
             bold=True
         )
         self.v_box.add(title_label)
         
         subtitle_label = arcade.gui.UILabel(
-            text="Combate de Sumativas",
-            font_size=40,
-            text_color=arcade.color.WHITE,
+            text="Invasión Zombie",
+            font_size=32,
+            text_color=arcade.color.LIGHT_GREEN,
+            font_name=("Kenney Future", "Arial"),
             bold=True
         )
         self.v_box.add(subtitle_label)
@@ -106,7 +108,7 @@ class MainMenu(arcade.View):
         btn_play.on_click = self.on_click_play
         self.v_box.add(btn_play)
         
-        btn_char = AnimatedButton(text="Selección de Personaje", width=300)
+        btn_char = AnimatedButton(text="Selector de Personaje", width=300)
         btn_char.on_click = self.on_click_char
         self.v_box.add(btn_char)
         
@@ -120,7 +122,7 @@ class MainMenu(arcade.View):
         
         # Panel de fondo oscuro translúcido detrás de los botones
         bg_panel = arcade.gui.UISpace(
-            width=400, height=450, color=(30, 40, 50, 200) # Simula la "pizarra" oscura
+            width=500, height=500, color=(20, 25, 30, 230) # Simula un panel sci-fi oscuro
         )
         
         # Posicionamos el VBox encima del panel
@@ -149,8 +151,8 @@ class MainMenu(arcade.View):
 
     def on_show_view(self) -> None:
         """Se ejecuta al mostrar la vista por primera vez."""
-        # Color temporal simulando el cielo de atardecer
-        arcade.set_background_color((214, 150, 110)) 
+        # Color oscuro sci-fi / apocalíptico
+        arcade.set_background_color((15, 15, 20)) 
         self.manager.enable()
 
     def on_hide_view(self):

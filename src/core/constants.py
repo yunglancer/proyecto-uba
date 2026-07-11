@@ -1,11 +1,11 @@
 """
-Constantes globales para el juego (Proyecto UBA).
+Constantes globales para el juego (Robots vs Zombies).
 """
 
 # Configuración de Ventana
 SCREEN_WIDTH = 1280
 SCREEN_HEIGHT = 720
-SCREEN_TITLE = "Proyecto UBA - Plataformero Asistido por IA"
+SCREEN_TITLE = "Robots vs Zombies"
 
 # Configuración de Tiles y Escala
 TILE_SIZE = 64

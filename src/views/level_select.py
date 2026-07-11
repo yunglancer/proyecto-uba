@@ -1,5 +1,6 @@
 import arcade
 import arcade.gui
+from src.views.main_menu import AnimatedButton
 from src.views.game_view import GameView
 
 class LevelSelect(arcade.View):
@@ -16,8 +17,9 @@ class LevelSelect(arcade.View):
         
         # Título
         title = arcade.gui.UILabel(
-            text="Seleccionar Nivel",
+            text="Selección de Nivel",
             font_size=36,
+            font_name=("Kenney Future", "Arial"),
             text_color=arcade.color.WHITE,
             bold=True
         )
@@ -25,21 +27,21 @@ class LevelSelect(arcade.View):
         self.v_box.add(arcade.gui.UIWidget(height=30))
         
         # Botones de Nivel
-        btn_tut = arcade.gui.UIFlatButton(text="Tutorial", width=250)
+        btn_tut = AnimatedButton(text="Jugar Tutorial", width=300)
         btn_tut.on_click = lambda e: self.start_level(0)
         self.v_box.add(btn_tut)
         
-        btn_lvl1 = arcade.gui.UIFlatButton(text="Nivel 1", width=250)
+        btn_lvl1 = AnimatedButton(text="Jugar Nivel 1", width=300)
         btn_lvl1.on_click = lambda e: self.start_level(1)
         self.v_box.add(btn_lvl1)
         
-        btn_lvl2 = arcade.gui.UIFlatButton(text="Nivel 2", width=250)
+        btn_lvl2 = AnimatedButton(text="Jugar Nivel 2", width=300)
         btn_lvl2.on_click = lambda e: self.start_level(2)
         self.v_box.add(btn_lvl2)
-        self.v_box.add(arcade.gui.UIWidget(height=20))
+        self.v_box.add(arcade.gui.UIWidget(height=40))
         
         # Volver
-        btn_back = arcade.gui.UIFlatButton(text="Volver al Menú", width=250)
+        btn_back = AnimatedButton(text="Volver al Menú", width=300)
         btn_back.on_click = self.on_click_back
         self.v_box.add(btn_back)
         
@@ -72,7 +74,7 @@ class LevelSelect(arcade.View):
         self.window.show_view(main_menu)
         
     def on_show_view(self) -> None:
-        arcade.set_background_color(arcade.color.DARK_SLATE_GRAY)
+        arcade.set_background_color((15, 15, 20))
         self.manager.enable()
         
     def on_hide_view(self):

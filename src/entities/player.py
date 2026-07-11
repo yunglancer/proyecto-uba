@@ -13,7 +13,7 @@ def load_texture_pair(filename: str):
 
 class Player(arcade.Sprite):
     """
-    Clase que representa al jugador (estudiante de ingeniería UBA).
+    Clase que representa al jugador (Robot de Combate).
     Maneja salud, escudo de burbuja, i-frames asíncronos, salto doble y animaciones.
     """
     
@@ -48,9 +48,9 @@ class Player(arcade.Sprite):
         self.facing_direction: int = 1  # Lógico: 1 = Derecha, -1 = Izquierda
         self.cur_texture: float = 0.0
         
-        # Carga de Texturas (Placeholder con Robot de Arcade)
-        # TODO: Cuando estén los assets, cambiar estas rutas a las imágenes reales
-        main_path = ":resources:images/animated_characters/robot/robot"
+        # Carga de Texturas extraídas de image_file para soportar diferentes skins
+        # Ejemplo: si image_file es ".../zombie_idle.png", main_path será ".../zombie"
+        main_path = image_file.replace("_idle.png", "")
         
         self.idle_texture_pair = load_texture_pair(f"{main_path}_idle.png")
         self.jump_texture_pair = load_texture_pair(f"{main_path}_jump.png")

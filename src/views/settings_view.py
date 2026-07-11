@@ -1,5 +1,6 @@
 import arcade
 import arcade.gui
+from src.views.main_menu import AnimatedButton
 
 class SettingsView(arcade.View):
     """
@@ -15,6 +16,7 @@ class SettingsView(arcade.View):
         title = arcade.gui.UILabel(
             text="Configuración",
             font_size=36,
+            font_name=("Kenney Future", "Arial"),
             text_color=arcade.color.WHITE,
             bold=True
         )
@@ -22,14 +24,18 @@ class SettingsView(arcade.View):
         self.v_box.add(arcade.gui.UIWidget(height=30))
         
         # Placeholder buttons
-        btn_audio = arcade.gui.UIFlatButton(text="Volumen General: 100%", width=300)
+        btn_audio = AnimatedButton(text="Volumen General: 100%", width=300)
         self.v_box.add(btn_audio)
         
-        btn_video = arcade.gui.UIFlatButton(text="Pantalla Completa: Desactivado", width=300)
-        self.v_box.add(btn_video)
+        # Botón dinámico de Pantalla Completa
+        # Nota: window no está disponible en __init__, así que ponemos un texto base 
+        # y lo actualizamos en on_show_view
+        self.btn_video = AnimatedButton(text="Pantalla Completa", width=300)
+        self.btn_video.on_click = self.on_click_fullscreen
+        self.v_box.add(self.btn_video)
         self.v_box.add(arcade.gui.UIWidget(height=40))
         
-        btn_back = arcade.gui.UIFlatButton(text="Volver al Menú", width=250)
+        btn_back = AnimatedButton(text="Volver al Menú", width=300)
         btn_back.on_click = self.on_click_back
         self.v_box.add(btn_back)
         
@@ -42,8 +48,21 @@ class SettingsView(arcade.View):
         self.manager.add(anchor)
 
     def on_show_view(self) -> None:
-        arcade.set_background_color(arcade.color.EERIE_BLACK)
+        arcade.set_background_color((15, 15, 20))
+        
+        # Actualizar texto según estado actual al abrir la vista
+        estado = "Activado" if self.window.fullscreen else "Desactivado"
+        self.btn_video.text = f"Pantalla Completa: {estado}"
+        
         self.manager.enable()
+        
+    def on_click_fullscreen(self, event):
+        """Alterna el modo Pantalla Completa."""
+        is_fullscreen = not self.window.fullscreen
+        self.window.set_fullscreen(is_fullscreen)
+        
+        estado = "Activado" if is_fullscreen else "Desactivado"
+        self.btn_video.text = f"Pantalla Completa: {estado}"
         
     def on_hide_view(self):
         self.manager.disable()

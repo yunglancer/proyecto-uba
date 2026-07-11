@@ -12,7 +12,7 @@ def load_texture_pair(filename: str):
 
 class Enemy(arcade.Sprite):
     """
-    Clase que representa a los enemigos ("Sumativas").
+    Clase que representa a los enemigos ("Zombies").
     Manejan patrullaje automático, detección de bordes predictiva, disparo y animación.
     """
     

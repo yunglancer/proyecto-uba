@@ -1,5 +1,6 @@
 import arcade
 import arcade.gui
+from src.views.main_menu import AnimatedButton
 
 class GameOver(arcade.View):
     """
@@ -24,11 +25,13 @@ class GameOver(arcade.View):
         self.v_box = arcade.gui.UIBoxLayout(space_between=20)
         
         # Título Dinámico
-        title_text = "¡APROBASTE!" if self.is_victory else "¡REPROBASTE!"
+        title_text = "¡VICTORIA!" if self.is_victory else "¡INFECTADO!"
+        title_color = arcade.color.WHITE
         title = arcade.gui.UILabel(
             text=title_text,
-            font_size=60,
-            text_color=arcade.color.WHITE,
+            font_size=48,
+            font_name=("Kenney Future", "Arial"),
+            text_color=title_color,
             bold=True
         )
         self.v_box.add(title)
@@ -36,21 +39,22 @@ class GameOver(arcade.View):
         
         # Subtítulo
         subtitle_text = (
-            "Lograste sobrevivir al semestre." if self.is_victory 
-            else "Las sumativas de la UBA te han vencido."
+            "¡Has repelido la invasión!" if self.is_victory 
+            else "Los zombies te han destruido."
         )
         subtitle = arcade.gui.UILabel(
             text=subtitle_text,
             font_size=20,
+            font_name=("Kenney Future", "Arial"),
             text_color=arcade.color.LIGHT_GRAY
         )
         self.v_box.add(subtitle)
         self.v_box.add(arcade.gui.UIWidget(height=50))
         
         # Botón Volver al Menú
-        menu_btn = arcade.gui.UIFlatButton(text="Volver al Menú Principal", width=300)
-        menu_btn.on_click = self.on_click_menu
-        self.v_box.add(menu_btn)
+        btn_menu = AnimatedButton(text="Volver al Menú Principal", width=300)
+        btn_menu.on_click = self.on_click_menu
+        self.v_box.add(btn_menu)
         
         anchor = arcade.gui.UIAnchorLayout()
         anchor.add(

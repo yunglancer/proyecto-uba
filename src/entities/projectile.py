@@ -8,22 +8,22 @@ class Projectile(arcade.SpriteSolidColor):
     Incorpora rutinas estrictas de optimización para evitar memory leaks.
     """
     
-    def __init__(self, is_enemy_projectile: bool = False):
+    def __init__(self, is_player_projectile: bool = True):
         """
         Inicializa un proyectil genérico (Greyboxing con color sólido).
         
         Args:
-            is_enemy_projectile: Define si es una ecuación (True) o grafito (False).
+            is_player_projectile: Define si es un láser (True) o un proyectil tóxico (False).
         """
-        if is_enemy_projectile:
-            # Ecuación enemiga: Cuadrado rojo
-            super().__init__(10, 10, color=arcade.color.RED)
+        if is_player_projectile:
+            # Láser: Rectángulo amarillo
+            super().__init__(16, 4, color=arcade.color.YELLOW)
         else:
-            # Lápiz Mágico: Rectángulo amarillo (tipo láser)
-            super().__init__(20, 5, color=arcade.color.YELLOW)
+            # Proyectil Tóxico (Zombie): Bola verde pequeña
+            super().__init__(12, 12, color=arcade.color.GREEN)
         
-        # Etiqueta para distinguir entre ataques del jugador y de las sumativas
-        self.is_enemy_projectile: bool = is_enemy_projectile
+        # Etiqueta para distinguir entre ataques del jugador y de los zombies
+        self.is_player_projectile: bool = is_player_projectile
         
         # Variables para optimización de recolección de basura
         # Se actualizarán desde el GameView cuando se cargue el mapa de Tiled
