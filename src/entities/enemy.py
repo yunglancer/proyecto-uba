@@ -1,6 +1,6 @@
 import arcade
 from typing import Optional, List
-from src.core.constants import ENEMY_MAX_HP, ENEMY_MOVEMENT_SPEED, ENEMY_DETECTION_RANGE, TILE_SIZE
+from src.core.constants import ENEMY_MAX_HP, ENEMY_MOVEMENT_SPEED, ENEMY_DETECTION_RANGE, TILE_SIZE, GRAVITY
 
 def load_texture_pair(filename: str):
     """Carga un par de texturas (original y volteada horizontalmente)"""
@@ -16,16 +16,18 @@ class Enemy(arcade.Sprite):
     Manejan patrullaje automático, detección de bordes predictiva, disparo y animación.
     """
     
-    def __init__(self):
+    def __init__(self, enemy_type: str = "shooter"):
         """
         Inicializa al enemigo cargando sus texturas animadas.
         """
         # hit_box_algorithm="Simple" forzado como regla de arquitectura
         super().__init__(hit_box_algorithm="Simple")
         
-        # Estadísticas
-        self.hp: int = ENEMY_MAX_HP
-        self.speed: float = ENEMY_MOVEMENT_SPEED
+        self.enemy_type = enemy_type
+        
+        # Estadísticas basadas en el tipo
+        self.hp: int = ENEMY_MAX_HP if enemy_type == "shooter" else ENEMY_MAX_HP - 1
+        self.speed: float = ENEMY_MOVEMENT_SPEED if enemy_type == "shooter" else ENEMY_MOVEMENT_SPEED * 2.5
         self.change_x = self.speed  # Comienza moviéndose a la derecha
         
         # Estado de disparo
@@ -54,6 +56,10 @@ class Enemy(arcade.Sprite):
             
         # Establecer textura inicial
         self.texture = self.idle_texture_pair[0]
+        
+        # Color distintivo para el runner
+        if self.enemy_type == "runner":
+            self.color = arcade.color.ORANGE_RED
         
     def take_damage(self, amount: int = 1) -> None:
         """Resta salud al enemigo, muestra efecto de daño y lo destruye si llega a cero."""
@@ -96,34 +102,66 @@ class Enemy(arcade.Sprite):
         frame = int(self.cur_texture)
         self.texture = self.walk_textures[frame][self.character_face_direction]
             
-    def update_patrol(self, ground_list: arcade.SpriteList) -> None:
+    def update_patrol(self, ground_list: arcade.SpriteList, player: Optional[arcade.Sprite] = None) -> None:
         """
-        Maneja el patrullaje del enemigo.
-        Calcula predictivamente si en la celda contigua (X +/- 64, Y - 64) hay suelo.
-        Si está vacío o choca, da la media vuelta para evitar caídas.
+        Lógica de patrullaje, persecución, gravedad simple y detección de bordes.
         """
-        direction_x = 1 if self.change_x > 0 else -1
+        # 0. Gravedad y colisión vertical
+        self.change_y -= GRAVITY
+        self.center_y += self.change_y
         
-        # Predicción de caída (Borde de plataforma)
+        # Chequeo de colisión con el suelo (usando la parte inferior del sprite)
+        ground_hits = arcade.get_sprites_at_point((self.center_x, self.bottom), ground_list)
+        if ground_hits:
+            # Encontrar el bloque más alto
+            highest_top = max([block.top for block in ground_hits])
+            if self.bottom < highest_top and self.change_y < 0:
+                self.bottom = highest_top
+                self.change_y = 0
+        
+        # 1. Determinar dirección objetivo
+        direction_x = 1 if self.change_x > 0 else (-1 if self.change_x < 0 else (1 if self.character_face_direction == 0 else -1))
+        
+        is_pursuing = False
+        if self.enemy_type == "runner" and player:
+            dist_x = player.center_x - self.center_x
+            dist_y = player.center_y - self.center_y
+            if (dist_x**2 + dist_y**2)**0.5 <= ENEMY_DETECTION_RANGE:
+                direction_x = 1 if dist_x > 0 else -1
+                
+        # 2. Predicción de caída y paredes frontales
         check_x = self.center_x + (TILE_SIZE * direction_x)
-        check_y = self.center_y - TILE_SIZE
+        check_y = self.center_y - TILE_SIZE - 4  # Un poco más abajo para asegurar que entre al hitbox del bloque
         
         hit_list = arcade.get_sprites_at_point((check_x, check_y), ground_list)
+        wall_hit_list = arcade.get_sprites_at_point((check_x, self.center_y), ground_list)
         
-        # Predicción de choque con muro enfrente
-        wall_check_x = self.center_x + (TILE_SIZE * direction_x)
-        wall_check_y = self.center_y
-        wall_hit_list = arcade.get_sprites_at_point((wall_check_x, wall_check_y), ground_list)
-        
-        # Si no hay suelo o hay pared, girar
+        # 3. Aplicar físicas
         if not hit_list or wall_hit_list:
-            self.change_x *= -1
+            if self.enemy_type == "runner" and player and (player.center_x - self.center_x)**2 <= ENEMY_DETECTION_RANGE**2:
+                # Si es runner y está persiguiendo, se tira del precipicio sin miedo (ignoramos hit_list)
+                if wall_hit_list:
+                    self.change_x = 0 # Pero si hay pared, se frena
+                else:
+                    self.change_x = self.speed * direction_x
+            elif self.enemy_type == "runner":
+                # Si es runner pero el jugador no está cerca, se frena en el borde
+                self.change_x = 0
+            else:
+                # Shooter: Patrullaje normal, da la vuelta en bordes o paredes
+                self.change_x = self.speed * (direction_x * -1)
+        else:
+            # Camino libre
+            self.change_x = self.speed * direction_x
             
     def check_and_shoot(self, player: arcade.Sprite, delta_time: float) -> bool:
         """
         Verifica si el jugador está a rango de visión para disparar.
-        Retorna True si debe efectuar el disparo.
+        Retorna True si debe efectuar el disparo. (Runners no disparan).
         """
+        if self.enemy_type == "runner":
+            return False
+            
         if not self.can_shoot:
             self.shoot_timer -= delta_time
             if self.shoot_timer <= 0:

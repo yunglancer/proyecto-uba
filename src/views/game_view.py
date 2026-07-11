@@ -52,11 +52,14 @@ class GameView(arcade.View):
         """
         # 1. Configuración de Cámaras
         self.camera = arcade.camera.Camera2D()
-        self.camera.zoom = 0.6  # Aleja la cámara para un plano más amplio tipo Katana Zero
+        self.camera.zoom = 0.6
         self.gui_camera = arcade.camera.Camera2D()
+        self.bg_camera = arcade.camera.Camera2D()
         
         # 2. Reinicio de variables de control
         self.key_spawned = False
+        self.score = 0
+        self.screen_shake = 0.0
         
         # Música de Fondo (BGM)
         self.bgm_player = None
@@ -69,6 +72,7 @@ class GameView(arcade.View):
         # Textos estáticos de UI para no generar PerformanceWarnings
         self.hp_label = arcade.Text("VIDA DEL JUGADOR", 20, SCREEN_HEIGHT - 10, arcade.color.WHITE, 14, font_name="Kenney Future", bold=True, anchor_y="top")
         self.shield_text = arcade.Text("ESCUDO ACTIVO", 20, SCREEN_HEIGHT - 60, arcade.color.CYAN, 14, font_name="Kenney Future", bold=True, anchor_y="top")
+        self.score_text = arcade.Text("SCORE: 0", SCREEN_WIDTH - 20, SCREEN_HEIGHT - 10, arcade.color.GOLD, 24, font_name="Kenney Future", bold=True, anchor_x="right", anchor_y="top")
         
         # Cargar sonidos básicos
         self.jump_sound = arcade.load_sound(":resources:sounds/jump1.wav")
@@ -77,7 +81,6 @@ class GameView(arcade.View):
         self.pickup_sound = arcade.load_sound(":resources:sounds/coin1.wav")
         
         # 3. Generación del Nivel (Procedural)
-        self.tile_map = None
         if True:
             self.scene = arcade.Scene()
             self.scene.add_sprite_list("Suelo", use_spatial_hash=True)
@@ -86,6 +89,16 @@ class GameView(arcade.View):
             self.scene.add_sprite_list("Proyectiles")
             self.scene.add_sprite_list("Objetos", use_spatial_hash=True)
             self.scene.add_sprite_list("Meta", use_spatial_hash=True)
+            self.scene.add_sprite_list("Fondo Estrellas")
+            
+            # Generar estrellas para Parallax
+            import random
+            for _ in range(150):
+                estrella = arcade.SpriteSolidColor(random.randint(2, 5), random.randint(2, 5), color=arcade.color.WHITE)
+                estrella.center_x = random.randint(-2000, 10000)
+                estrella.center_y = random.randint(100, 1500)
+                estrella.alpha = random.randint(100, 255)
+                self.scene.add_sprite("Fondo Estrellas", estrella)
             
             def crear_bloque(x, y):
                 bloque = arcade.SpriteSolidColor(64, 64, color=arcade.color.DARK_GREEN)
@@ -123,7 +136,7 @@ class GameView(arcade.View):
                 
                 posiciones_enemigos = [(1000, 160), (2000, 32), (3500, 32), (4000, 32)]
                 for x, y in posiciones_enemigos:
-                    enemy = Enemy()
+                    enemy = Enemy(enemy_type="shooter")
                     enemy.center_x = x
                     enemy.bottom = y + 32
                     self.scene.add_sprite("Enemigos", enemy)
@@ -172,7 +185,7 @@ class GameView(arcade.View):
                     (6200, 32), (7200, 32), (8000, 32), (9200, 32)
                 ]
                 for x, y in posiciones_enemigos:
-                    enemy = Enemy()
+                    enemy = Enemy(enemy_type="shooter")
                     enemy.center_x = x
                     enemy.bottom = y + 32
                     self.scene.add_sprite("Enemigos", enemy)
@@ -228,12 +241,19 @@ class GameView(arcade.View):
         """Renderiza la pantalla."""
         self.clear()
         
+        # 0. Dibujar fondo Parallax con su cámara al 20% de velocidad
+        if self.bg_camera and self.camera:
+            self.bg_camera.position = (self.camera.position[0] * 0.2, self.camera.position[1] * 0.2)
+            self.bg_camera.use()
+            if self.scene:
+                self.scene.get_sprite_list("Fondo Estrellas").draw()
+        
         # 1. Dibujar el mundo con la cámara del mundo
         if self.camera:
             self.camera.use()
         
         if self.scene:
-            self.scene.draw()
+            self.scene.draw(names=["Suelo", "Player", "Enemigos", "Proyectiles", "Objetos", "Meta"])
             
         # 2. Dibujar UI estática con la cámara de interfaz
         if self.gui_camera:
@@ -257,6 +277,10 @@ class GameView(arcade.View):
             
             # Etiqueta de HP pre-renderizada
             self.hp_label.draw()
+            
+            # Etiqueta de Score
+            self.score_text.text = f"SCORE: {self.score}"
+            self.score_text.draw()
             
             if self.player_sprite.has_bubble_shield:
                 self.shield_text.draw()
@@ -327,6 +351,17 @@ class GameView(arcade.View):
         if not self.camera or not self.player_sprite:
             return
             
+        # Screen Shake effect logic
+        shake_x = 0
+        shake_y = 0
+        if self.screen_shake > 0:
+            import random
+            shake_x = random.uniform(-self.screen_shake, self.screen_shake)
+            shake_y = random.uniform(-self.screen_shake, self.screen_shake)
+            self.screen_shake -= 1
+            if self.screen_shake < 0:
+                self.screen_shake = 0
+                
         # Offset predictivo (Katana Zero style): Mira un poco hacia adelante
         look_ahead = 0
         if self.player_sprite.change_x > 0:
@@ -354,9 +389,9 @@ class GameView(arcade.View):
         # Paneo dinámico suave usando lerp
         current_x, current_y = self.camera.position
         
-        # 0.08 hace el movimiento un poco más "elástico/cinemático"
-        new_x = arcade.math.lerp(current_x, target_x, 0.08)
-        new_y = arcade.math.lerp(current_y, target_y, 0.08)
+        # Aplicamos el shake sobre la posición objetivo
+        new_x = arcade.math.lerp(current_x, target_x + shake_x, 0.08)
+        new_y = arcade.math.lerp(current_y, target_y + shake_y, 0.08)
             
         self.camera.position = (new_x, new_y)
 
@@ -433,12 +468,14 @@ class GameView(arcade.View):
                 enemigos_golpeados = arcade.check_for_collision_with_list(proj, enemigos)
                 for enemigo in enemigos_golpeados:
                     enemigo.take_damage(1)
+                    self.score += 100
                     proj.kill()
                     arcade.play_sound(self.hit_sound)
             else:
                 # Proyectil enemigo choca con el jugador
                 if arcade.check_for_collision(proj, self.player_sprite):
                     self.player_sprite.take_damage(1)
+                    self.screen_shake = 10.0
                     proj.kill()
                     arcade.play_sound(self.hit_sound)
                     
@@ -446,6 +483,7 @@ class GameView(arcade.View):
         objetos_recolectados = arcade.check_for_collision_with_list(self.player_sprite, self.scene.get_sprite_list("Objetos"))
         for obj in objetos_recolectados:
             arcade.play_sound(self.pickup_sound)
+            self.score += 50
             if hasattr(obj, "pickup_type"):
                 if obj.pickup_type == "hp":
                     from src.core.constants import PLAYER_MAX_HP
